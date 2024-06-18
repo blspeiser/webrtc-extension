@@ -3,16 +3,23 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <string>
+#include <vector>
+
 #include "api/array_view.h"
 #include "api/crypto/frame_encryptor_interface.h"
 #include "api/media_types.h"
 #include "rtc_base/ref_counted_object.h"
 
+#include <openssl/aes.h>
+
 namespace webrtc {
   class Aes256FrameEncryptor : public rtc::RefCountedObject<FrameEncryptorInterface> {
     public:
       //Constructor. @key is expected to be exactly 32 bytes.
-      explicit Aes256FrameEncryptor(uint8_t key[]); 
+      explicit Aes256FrameEncryptor(
+        std::vector<uint8_t> key,
+        std::vector<uint8_t> iv); 
       
       //Destructor
       ~Aes256FrameEncryptor();
@@ -31,8 +38,14 @@ namespace webrtc {
           cricket::MediaType media_type,
           size_t frame_size) override;
 
+      bool hadError();
+      const char* getErrorMessage();
+
     private:
-        uint8_t secretKey[];
+        std::vector<uint8_t> _key;
+        std::vector<uint8_t> _iv;
+        std::string _error;
+        AES_KEY _aes_key;
   };
 }
 
