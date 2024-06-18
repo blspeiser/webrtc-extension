@@ -1,3 +1,6 @@
 libwebrtc/
 filelist.txt
 extension/bin/
+extension/source/third_party/boringssl/src/
+extension/source/third_party/boringssl/android-sources.cmake
+
