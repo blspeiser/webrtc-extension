@@ -60,6 +60,7 @@ namespace webrtc {
     for(size_t i = 0, n = frame.size(); i < n; i++) {
       encrypted_frame[i] = encrypted[i];
     }
+    *bytes_written = padded_size;
     return 0;
   }
 
