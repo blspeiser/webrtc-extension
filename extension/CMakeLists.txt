@@ -7,15 +7,14 @@ set(WEBRTC_BUILD ${WEBRTC_SRC}/out/Release)
 set(BORINGSSL_SRC ${PROJECT_SOURCE_DIR}/source/third_party/boringssl/src)
 set(BORINGSSL_BUILD ${PROJECT_SOURCE_DIR}/source/third_party/boringssl/src/build)
 
-
 file(GLOB_RECURSE CUSTOM_STL_OBJS ${WEBRTC_BUILD}/obj/buildtools/third_party/libc++/libc++/*.o)
 file(GLOB_RECURSE CUSTOM_ABI_OBJS ${WEBRTC_BUILD}/obj/buildtools/third_party/libc++abi/libc++abi/*.o)
-file(GLOB_RECURSE CLANG_LIBRARIES /home/sbaruch/android-ndk-r26d/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/17/lib/linux/arm/*.a)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_COMPILER_TARGET "arm-linux-androideabi32")
 set(CMAKE_CXX_COMPILER ${WEBRTC_SRC}/third_party/llvm-build/Release+Asserts/bin/clang)
 
+#====== libsrtp ======
 add_library(${CMAKE_PROJECT_NAME} STATIC)
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE WEBRTC_LINUX WEBRTC_POSIX)
 
