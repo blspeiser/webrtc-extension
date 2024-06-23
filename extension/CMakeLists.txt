@@ -3,15 +3,11 @@ project("srtp" VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_BUILD_TYPE Release)
 set(WEBRTC_SRC ${PROJECT_SOURCE_DIR}/../libwebrtc/src)
-set(WEBRTC_BUILD ${WEBRTC_SRC}/out/Release)
+set(WEBRTC_BUILD ${PROJECT_SOURCE_DIR}/../prebuilt/ubuntu-20.04/ndk-26.3.11579264/arm64-v8a/android-32)
 set(BORINGSSL_SRC ${PROJECT_SOURCE_DIR}/source/third_party/boringssl/src)
 set(BORINGSSL_BUILD ${PROJECT_SOURCE_DIR}/source/third_party/boringssl/src/build)
 
-file(GLOB_RECURSE CUSTOM_STL_OBJS ${WEBRTC_BUILD}/obj/buildtools/third_party/libc++/libc++/*.o)
-file(GLOB_RECURSE CUSTOM_ABI_OBJS ${WEBRTC_BUILD}/obj/buildtools/third_party/libc++abi/libc++abi/*.o)
-
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_COMPILER_TARGET "arm-linux-androideabi32")
 set(CMAKE_CXX_COMPILER ${WEBRTC_SRC}/third_party/llvm-build/Release+Asserts/bin/clang)
 
 #====== libsrtp ======
@@ -33,8 +29,6 @@ target_sources(${CMAKE_PROJECT_NAME}
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
         PRIVATE
-        ${WEBRTC_BUILD}/obj/libwebrtc.a
+        ${WEBRTC_BUILD}/libjingle_peerconnection_so.so
         ${BORINGSSL_BUILD}/libcrypto.so
-        ${CUSTOM_STL_OBJS}
-        ${CUSTOM_ABI_OBJS}
 )
