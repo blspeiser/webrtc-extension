@@ -34,7 +34,7 @@ target_sources(${CMAKE_PROJECT_NAME}
 target_link_libraries(${CMAKE_PROJECT_NAME}
         PRIVATE
         ${WEBRTC_BUILD}/obj/libwebrtc.a
-        ${BORINGSSL_BUILD}/libcrypto.a
+        ${BORINGSSL_BUILD}/libcrypto.so
         ${CUSTOM_STL_OBJS}
         ${CUSTOM_ABI_OBJS}
 )
