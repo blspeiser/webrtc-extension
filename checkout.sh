@@ -5,5 +5,5 @@ fetch --nohooks webrtc_android
 gclient sync
 git pull
 cd src
-sh build/install-build-deps.sh
+sh build/install-build-deps.sh --android --arm
 gclient sync
