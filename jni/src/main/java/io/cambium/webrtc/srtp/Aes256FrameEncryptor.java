@@ -7,6 +7,7 @@ import org.webrtc.FrameEncryptor;
 public class Aes256FrameEncryptor implements FrameEncryptor {
   private final byte[] key;
   private final byte[] iv;
+  private long pointer; 
   
   static {
     System.loadLibrary("srtp");
