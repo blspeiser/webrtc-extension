@@ -39,7 +39,7 @@
                 <mkdir dir="target/classes/${abi}"/>
                 <copy todir="target/classes/${abi}">
                   <fileset dir="${project.basedir}/../prebuilt/${library.platform}">
-                    <include name="libsrtp.a"/>
+                    <include name="libsrtp.so"/>
                     <include name="libcrypto.so"/>
                   </fileset>
                 </copy>
