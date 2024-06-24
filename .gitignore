@@ -1,4 +1,8 @@
 .vscode/
+.settings/
+.project
+.classpath
+target/
 libwebrtc/
 filelist.txt
 extension/bin/

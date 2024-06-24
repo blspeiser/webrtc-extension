@@ -1,0 +1,73 @@
+<project 
+  xmlns="https://maven.apache.org/POM/4.0.0" 
+  xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>io.cambium.webrtc</groupId>
+  <artifactId>srtp-plugin</artifactId>
+  <version>1.0.0</version>
+  <name>srtp-plugin</name>
+  <properties>
+    <java.version>8</java.version>
+    <maven.compiler.release>8</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <library.platform>ubuntu-20.04/ndk-26.3.11579264/arm64-v8a/android-32</library.platform>
+    <abi>arm64-v8a</abi>
+  </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <source>8</source>
+          <target>8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <!-- add native libraries (assume the webrtc library will be packaged in the original Google Webrtc dependency) -->
+                <mkdir dir="target/classes/${abi}"/>
+                <copy todir="target/classes/${abi}">
+                  <fileset dir="${project.basedir}/../prebuilt/${library.platform}">
+                    <include name="libsrtp.a"/>
+                    <include name="libcrypto.so"/>
+                  </fileset>
+                </copy>
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>         
+    </plugins>
+  </build>  
+  <dependencies>
+    <dependency>
+      <!-- 
+        org.webrtc:google-webrtc was deprecated by Google;
+        they now ask you to build it yourself. So we use a 
+        system-scoped prebuilt jar instead of a normal dependency.   
+      -->
+      <groupId>org.webrtc</groupId>
+      <artifactId>google-webrtc</artifactId>
+      <version>1.0.42469</version> 
+      <scope>system</scope>
+      <systemPath>${project.basedir}/../prebuilt/ubuntu-20.04/ndk-26.3.11579264/arm64-v8a/android-32/google-webrtc-1.0.42469.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
