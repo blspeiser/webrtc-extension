@@ -65,7 +65,7 @@ JNIEXPORT jlong JNICALL Java_io_cambium_webrtc_srtp_Aes256FrameEncryptor_initial
     //otherwise
     __android_log_print(ANDROID_LOG_DEBUG, LOG_TOPIC, 
                         "Created native Aes256FrameEncryptor successfully, pointer: %p", frameEncryptor);
-    jlong pointer = jlong(&frameEncryptor); //jlong constructor here is very important to avoid pointer mangling!!!
+    jlong pointer = reinterpret_cast<jlong>(frameEncryptor);
     return pointer;
 }
 
@@ -106,7 +106,8 @@ JNIEXPORT jbyteArray JNICALL Java_io_cambium_webrtc_srtp_Aes256FrameEncryptor_en
     }
     webrtc::Aes256FrameEncryptor* frameEncryptor = reinterpret_cast<webrtc::Aes256FrameEncryptor*>(pointer);
     __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, 
-                            "Retrieved native Aes256FrameEncryptor at pointer: %p, checking for errors...", pointer);
+                            "Retrieved native Aes256FrameEncryptor at pointer: %p, checking for errors...", 
+                            frameEncryptor);
     if(frameEncryptor->hadError()) {
         __android_log_print(ANDROID_LOG_ERROR, LOG_TOPIC,
                             "Native Aes256FrameEncryptor had error, cannot encrypt: %s",
