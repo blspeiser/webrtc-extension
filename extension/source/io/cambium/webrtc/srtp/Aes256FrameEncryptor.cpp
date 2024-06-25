@@ -16,6 +16,10 @@ extern "C" {
 const char* ENCRYPTOR_CLASS = "io/cambium/webrtc/srtp/Aes256FrameEncryptor";
 const char* LOG_TOPIC = "io.cambium.webrtc.srtp.Aes256FrameEncryptor";
 
+namespace io_cambium_webrtc_srtp {
+    webrtc::Aes256FrameEncryptor* frameEncryptor = nullptr;
+}
+
 JNIEXPORT jlong JNICALL Java_io_cambium_webrtc_srtp_Aes256FrameEncryptor_initialize(
         JNIEnv* env,
         jobject instance)
@@ -65,7 +69,8 @@ JNIEXPORT jlong JNICALL Java_io_cambium_webrtc_srtp_Aes256FrameEncryptor_initial
     //otherwise
     __android_log_print(ANDROID_LOG_DEBUG, LOG_TOPIC, 
                         "Created native Aes256FrameEncryptor successfully, pointer: %p", frameEncryptor);
-    jlong pointer = jlong(&frameEncryptor); //jlong constructor here is very important to avoid pointer mangling!!!
+    jlong pointer = reinterpret_cast<jlong>(&frameEncryptor);
+    io_cambium_webrtc_srtp::frameEncryptor = frameEncryptor;
     return pointer;
 }
 
@@ -74,7 +79,9 @@ JNIEXPORT void JNICALL Java_io_cambium_webrtc_srtp_Aes256FrameEncryptor_destroy(
         jobject instance,
         jlong pointer)
 {
-    webrtc::Aes256FrameEncryptor* frameEncryptor = reinterpret_cast<webrtc::Aes256FrameEncryptor*>(pointer);
+    webrtc::Aes256FrameEncryptor* frameEncryptor = 
+        //reinterpret_cast<webrtc::Aes256FrameEncryptor*>(pointer);
+        io_cambium_webrtc_srtp::frameEncryptor;
     __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, 
                         "Deleting native Aes256FrameEncryptor at pointer: %p", frameEncryptor);
     delete frameEncryptor;
@@ -104,9 +111,12 @@ JNIEXPORT jbyteArray JNICALL Java_io_cambium_webrtc_srtp_Aes256FrameEncryptor_en
                             "Passed a zero-value pointer, cannot retrieve native Aes256FrameEncryptor");
         return NULL;
     }
-    webrtc::Aes256FrameEncryptor* frameEncryptor = reinterpret_cast<webrtc::Aes256FrameEncryptor*>(pointer);
+    webrtc::Aes256FrameEncryptor* frameEncryptor = 
+        //reinterpret_cast<webrtc::Aes256FrameEncryptor*>(pointer);
+        io_cambium_webrtc_srtp::frameEncryptor;
     __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, 
-                            "Retrieved native Aes256FrameEncryptor at pointer: %p, checking for errors...", pointer);
+                            "Retrieved native Aes256FrameEncryptor at pointer: %p, checking for errors...", 
+                            frameEncryptor);
     if(frameEncryptor->hadError()) {
         __android_log_print(ANDROID_LOG_ERROR, LOG_TOPIC,
                             "Native Aes256FrameEncryptor had error, cannot encrypt: %s",
