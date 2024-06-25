@@ -69,7 +69,7 @@ JNIEXPORT jlong JNICALL Java_io_cambium_webrtc_srtp_Aes256FrameEncryptor_initial
     //otherwise
     __android_log_print(ANDROID_LOG_DEBUG, LOG_TOPIC, 
                         "Created native Aes256FrameEncryptor successfully, pointer: %p", frameEncryptor);
-    jlong pointer = reinterpret_cast<jlong>(&frameEncryptor);
+    jlong pointer = reinterpret_cast<jlong>(frameEncryptor);
     __android_log_print(ANDROID_LOG_DEBUG, LOG_TOPIC, 
                         "Pointer when casted as a jlong: %p", pointer);
     io_cambium_webrtc_srtp::frameEncryptor = frameEncryptor;
