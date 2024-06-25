@@ -24,7 +24,7 @@ public class Aes256FrameEncryptor implements FrameEncryptor {
     this.iv = iv;
     this.pointer = initialize();
     if(this.pointer == 0) {
-      throw new TypeNotPresentException("Unable to instantiate the backing native implementation", null);
+      throw new TypeNotPresentException("Native Aes256FrameEncryptor", null); //message is appended with " type not present"
     }
   }
   

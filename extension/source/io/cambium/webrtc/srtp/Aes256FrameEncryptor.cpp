@@ -96,35 +96,45 @@ JNIEXPORT jbyteArray JNICALL Java_io_cambium_webrtc_srtp_Aes256FrameEncryptor_en
     size_t size = env->GetArrayLength(bytes);
     if(!size) {
         __android_log_print(ANDROID_LOG_DEBUG, LOG_TOPIC,
-                            "Asked to encrypt empty array; returning new empty array!");
+                            "Asked to encrypt empty array; returning new empty array");
         return env->NewByteArray(0);                            
     }
+    if(!pointer) {
+        __android_log_print(ANDROID_LOG_ERROR, LOG_TOPIC,
+                            "Passed a zero-value pointer, cannot retrieve native Aes256FrameEncryptor");
+        return NULL;
+    }
     __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, 
-                            "Retrieving native object at pointer: %p", reinterpret_cast<void*>(pointer));
+                            "Retrieving native Aes256FrameEncryptor at pointer: %p", reinterpret_cast<void*>(pointer));
     webrtc::Aes256FrameEncryptor* frameEncryptor = reinterpret_cast<webrtc::Aes256FrameEncryptor*>(pointer);
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, 
+                            "Checking if native Aes256FrameEncryptor had an error...");
     if(frameEncryptor->hadError()) {
         __android_log_print(ANDROID_LOG_ERROR, LOG_TOPIC,
                             "Native Aes256FrameEncryptor had error, cannot encrypt: %s",
                             frameEncryptor->getErrorMessage());
         return NULL;
     }
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, 
+                            "Calculating encrypted buffer size...");
     size_t padded_size = frameEncryptor->GetMaxCiphertextByteSize(cricket::MediaType::MEDIA_TYPE_DATA, size);
     __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, 
                             "Declaring buffers; content size: %lu, encrypted size: %lu", size, padded_size);
     std::vector<uint8_t> content(size);
     std::vector<uint8_t> buffer(padded_size);
-    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, "Declaring buffers...");
     rtc::ArrayView<uint8_t> data(content.data(), size);
     rtc::ArrayView<uint8_t> encrypted(buffer.data(), padded_size);
     size_t bytes_written = 0;
-    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, "Preparing to encrypt...");
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, "Encrypting...");
     frameEncryptor->Encrypt(cricket::MediaType::MEDIA_TYPE_DATA, 0, nullptr, data, encrypted, &bytes_written);
     if(frameEncryptor->hadError()) {
         __android_log_print(ANDROID_LOG_ERROR, LOG_TOPIC,
                             "Native Aes256FrameEncryptor had error while encrypting: %s",
                             frameEncryptor->getErrorMessage());
     }
-    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, "Data encrypted successfully; preparing byte array for return...");
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, 
+                            "Data encrypted successfully (%lu bytes written); preparing byte array for return...",
+                            bytes_written);
     jbyteArray result = env->NewByteArray(padded_size);
     env->SetByteArrayRegion(result, 0, padded_size, reinterpret_cast<jbyte*>(encrypted.data()));
     __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, "Encryption operation completed successfully.");
