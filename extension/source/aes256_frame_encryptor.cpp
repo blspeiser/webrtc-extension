@@ -68,7 +68,7 @@ namespace webrtc {
     cricket::MediaType media_type,
     size_t frame_size) 
   {
-    // AES256/CBC/PKCS#5 uses 128-bit blocks, so the size will always be a multiple of 16. 
+    // AES256/CBC uses 128-bit blocks, so the size will always be a multiple of 16. 
     return (frame_size + 16) & ~15; //fastest way to say size + (size % 16)
   }
 
