@@ -104,11 +104,9 @@ JNIEXPORT jbyteArray JNICALL Java_io_cambium_webrtc_srtp_Aes256FrameEncryptor_en
                             "Passed a zero-value pointer, cannot retrieve native Aes256FrameEncryptor");
         return NULL;
     }
-    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, 
-                            "Retrieving native Aes256FrameEncryptor at pointer: %p", reinterpret_cast<void*>(pointer));
     webrtc::Aes256FrameEncryptor* frameEncryptor = reinterpret_cast<webrtc::Aes256FrameEncryptor*>(pointer);
     __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, 
-                            "Checking if native Aes256FrameEncryptor had an error...");
+                            "Retrieved native Aes256FrameEncryptor at pointer: %p, checking for errors...", pointer);
     if(frameEncryptor->hadError()) {
         __android_log_print(ANDROID_LOG_ERROR, LOG_TOPIC,
                             "Native Aes256FrameEncryptor had error, cannot encrypt: %s",
