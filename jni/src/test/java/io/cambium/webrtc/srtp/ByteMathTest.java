@@ -7,14 +7,14 @@ import org.junit.Test;
 public class ByteMathTest {
 
   public static int adjust(int x) {
-    return (x%16 == 0) ? x : (x + 16) & ~15;
+    return (x + 16) & ~15;
   }
   
   @Test
   public void testMath() {
-    assertEquals(128, adjust(128));
+    assertEquals(144, adjust(128));
     assertEquals(128, adjust(127));
-    assertEquals(112, adjust(112));
+    assertEquals(128, adjust(112));
     assertEquals(112, adjust(111));
   }
   

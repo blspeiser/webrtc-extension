@@ -69,7 +69,8 @@ namespace webrtc {
     size_t frame_size) 
   {
     // AES256/CBC uses 128-bit blocks, so the size will always be a multiple of 16. 
-    return (frame_size % 16 == 0) ? frame_size : (frame_size + 16) & ~15;
+    // If the value is already a multiple of 16, it is supposed to be bumped up to the next multiple. 
+    return (frame_size + 16) & ~15;
   }
 
   bool Aes256FrameEncryptor::hadError() { return _error.length() > 0; }
