@@ -22,18 +22,30 @@ public class Aes256FrameEncryptor implements FrameEncryptor {
     }
     this.key = key;
     this.iv = iv;
+    this.pointer = initialize();
+    if(this.pointer == 0) {
+      throw new TypeNotPresentException("Unable to instantiate the backing native implementation", null);
+    }
   }
   
   public Aes256FrameEncryptor(SecretKey key, String ivHex) {
     this(key.getEncoded(), decode(ivHex));
   }
 
-  @Override
-  public native long getNativeFrameEncryptor();
-  public native long cleanupNativeFrameEncryptor();
+  private native long initialize();
+  private native void destroy(long pointer);
   
-  public native byte[] encrypt(byte[] bytes);
-
+  //These method exists for testing the JNI and native implementation. 
+  private native byte[] encrypt(long pointer, byte[] bytes);
+  public byte[] encrypt(byte[] bytes) { 
+    return encrypt(this.pointer, bytes); 
+  }
+  
+  @Override
+  public long getNativeFrameEncryptor() {
+    return this.pointer;
+  }
+  
   /* 
    * Normally you should never override finalize, but since
    * we are holding on to natively allocated memory, we must
@@ -42,7 +54,7 @@ public class Aes256FrameEncryptor implements FrameEncryptor {
    */
   @Override
   protected void finalize() throws Throwable {
-    cleanupNativeFrameEncryptor();
+    destroy(this.pointer);
     super.finalize();
   }
   

@@ -16,9 +16,9 @@ extern "C" {
 const char* ENCRYPTOR_CLASS = "io/cambium/webrtc/srtp/Aes256FrameEncryptor";
 const char* LOG_TOPIC = "io.cambium.webrtc.srtp.Aes256FrameEncryptor";
 
-JNIEXPORT jlong JNICALL Java_io_cambium_webrtc_srtp_Aes256FrameEncryptor_getNativeFrameEncryptor(
-    JNIEnv* env,
-    jobject instance)
+JNIEXPORT jlong JNICALL Java_io_cambium_webrtc_srtp_Aes256FrameEncryptor_initialize(
+        JNIEnv* env,
+        jobject instance)
 {
     const jclass clazz = env->FindClass(ENCRYPTOR_CLASS);
     const jfieldID fieldKey = env->GetFieldID(clazz, "key", "[B");
@@ -37,49 +37,55 @@ JNIEXPORT jlong JNICALL Java_io_cambium_webrtc_srtp_Aes256FrameEncryptor_getNati
     }
     const jint sizeKey      = env->GetArrayLength(key);
     const jint sizeIV       = env->GetArrayLength(iv);
+    if(sizeKey != 32) {
+        __android_log_print(ANDROID_LOG_ERROR, LOG_TOPIC,
+                            "Key is not 32 bytes: %d", sizeKey);
+        return 0;
+    }
+    if(sizeIV != 16) {
+        __android_log_print(ANDROID_LOG_ERROR, LOG_TOPIC,
+                            "Initialization Vector is not 16 bytes: %d", sizeIV);
+        return 0;
+    }
     __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC,
                             "Key size: %d,  Initialization Vector size: %d", sizeKey, sizeIV);
     std::vector<uint8_t> vKey(sizeKey);
     std::vector<uint8_t> vIV(sizeIV);
-    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, "Reading byte arrays from Java object...");
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, "Reading byte arrays from Java Aes256FrameEncryptor...");
     env->GetByteArrayRegion(key, 0, sizeKey, reinterpret_cast<jbyte*>(vKey.data()));
     env->GetByteArrayRegion(iv,  0, sizeIV,  reinterpret_cast<jbyte*>(vIV.data()));
-    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, "Creative native object...");
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, "Creative native Aes256FrameEncryptor...");
     webrtc::Aes256FrameEncryptor* frameEncryptor = new webrtc::Aes256FrameEncryptor(vKey, vIV);
     if(frameEncryptor->hadError()) {
         __android_log_print(ANDROID_LOG_ERROR, LOG_TOPIC,
-                            "Error while creating frame encryptor: %s",
+                            "Error while creating native Aes256FrameEncryptor: %s",
                             frameEncryptor->getErrorMessage());
         return 0;
     }
     //otherwise
-    __android_log_print(ANDROID_LOG_DEBUG, LOG_TOPIC, "Created native Aes256FrameEncryptor successfully.");
-
+    __android_log_print(ANDROID_LOG_DEBUG, LOG_TOPIC, 
+                        "Created native Aes256FrameEncryptor successfully, pointer: %p", frameEncryptor);
     jlong pointer = reinterpret_cast<jlong>(&frameEncryptor);
-    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, 
-                        "Saving pointer to native object: %p", reinterpret_cast<void*>(pointer));
-    const jfieldID fieldPointer = env->GetFieldID(clazz, "pointer", "J");
-    env->SetLongField(instance, fieldPointer, pointer);
     return pointer;
 }
 
-JNIEXPORT void JNICALL Java_io_cambium_webrtc_srtp_Aes256FrameEncryptor_cleanupNativeFrameEncryptor(
+JNIEXPORT void JNICALL Java_io_cambium_webrtc_srtp_Aes256FrameEncryptor_destroy(
         JNIEnv* env,
-        jobject instance)
+        jobject instance,
+        jlong pointer)
 {
-    const jclass clazz = env->FindClass(ENCRYPTOR_CLASS);
-    const jfieldID fieldPointer = env->GetFieldID(clazz, "pointer", "J");
-    const jlong pointer = env->GetLongField(instance, fieldPointer);
-    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, 
-                        "Deleting native object at pointer: %p", reinterpret_cast<void*>(pointer));
     webrtc::Aes256FrameEncryptor* frameEncryptor = reinterpret_cast<webrtc::Aes256FrameEncryptor*>(pointer);
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, 
+                        "Deleting native Aes256FrameEncryptor at pointer: %p", frameEncryptor);
     delete frameEncryptor;
-    __android_log_print(ANDROID_LOG_DEBUG, LOG_TOPIC, "Deleted native Aes256FrameEncryptor successfully.");
+    __android_log_print(ANDROID_LOG_DEBUG, LOG_TOPIC, 
+                        "Deleted native Aes256FrameEncryptor successfully.");
 }
 
 JNIEXPORT jbyteArray JNICALL Java_io_cambium_webrtc_srtp_Aes256FrameEncryptor_encrypt(
         JNIEnv* env,
         jobject instance,
+        jlong pointer,
         jbyteArray bytes)
 {
     if(!bytes) {
@@ -93,11 +99,8 @@ JNIEXPORT jbyteArray JNICALL Java_io_cambium_webrtc_srtp_Aes256FrameEncryptor_en
                             "Asked to encrypt empty array; returning new empty array!");
         return env->NewByteArray(0);                            
     }
-    const jclass clazz = env->FindClass(ENCRYPTOR_CLASS);
-    const jfieldID fieldPointer = env->GetFieldID(clazz, "pointer", "J");
-    const jlong pointer = env->GetLongField(instance, fieldPointer);
     __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, 
-                        "Retrieving native object at pointer: %p", reinterpret_cast<void*>(pointer));
+                            "Retrieving native object at pointer: %p", reinterpret_cast<void*>(pointer));
     webrtc::Aes256FrameEncryptor* frameEncryptor = reinterpret_cast<webrtc::Aes256FrameEncryptor*>(pointer);
     if(frameEncryptor->hadError()) {
         __android_log_print(ANDROID_LOG_ERROR, LOG_TOPIC,
