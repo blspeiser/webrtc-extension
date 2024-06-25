@@ -38,7 +38,7 @@ namespace webrtc {
   }
 
   Aes256FrameEncryptor::~Aes256FrameEncryptor() {
-    //nothing
+    //nothing to do (_aes_key is not a pointer type, so don't need to delete it; and neither are the stl fields)
   }
 
   int Aes256FrameEncryptor::Encrypt(
@@ -49,8 +49,8 @@ namespace webrtc {
     rtc::ArrayView<uint8_t> encrypted_frame,
     size_t* bytes_written) 
   {
-    //First, calculate encrypted size, which rounds up to the nearest 16
-    const size_t padded_size = (frame.size() + 16) & ~15;
+    //First, calculate encrypted size:
+    const size_t padded_size = GetMaxCiphertextByteSize(cricket::MediaType::MEDIA_TYPE_DATA, frame.size());
     //Initialize a buffer to encrypt into:
     uint8_t encrypted[padded_size];
     memset(encrypted, 0, sizeof(encrypted));
@@ -60,7 +60,7 @@ namespace webrtc {
     for(size_t i = 0, n = frame.size(); i < n; i++) {
       encrypted_frame[i] = encrypted[i];
     }
-    *bytes_written = padded_size;
+    if(bytes_written) *bytes_written = padded_size;
     return 0;
   }
 
