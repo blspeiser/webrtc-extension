@@ -16,7 +16,7 @@
 namespace webrtc {
   class Aes256FrameEncryptor : public rtc::RefCountedObject<FrameEncryptorInterface> {
     public:
-      //Constructor. @key is expected to be exactly 32 bytes.
+      //Constructor. @key is expected to be exactly 32 bytes, @iv is expected to be 16 bytes.
       explicit Aes256FrameEncryptor(
         std::vector<uint8_t> key,
         std::vector<uint8_t> iv); 
