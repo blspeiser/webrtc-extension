@@ -121,6 +121,7 @@ JNIEXPORT jbyteArray JNICALL Java_io_cambium_webrtc_srtp_Aes256FrameEncryptor_en
                             "Declaring buffers; content size: %lu, encrypted size: %lu", size, padded_size);
     std::vector<uint8_t> content(size);
     std::vector<uint8_t> buffer(padded_size);
+    env->GetByteArrayRegion(bytes, 0, size, reinterpret_cast<jbyte*>(content.data()));
     rtc::ArrayView<uint8_t> data(content.data(), size);
     rtc::ArrayView<uint8_t> encrypted(buffer.data(), padded_size);
     size_t bytes_written = 0;
