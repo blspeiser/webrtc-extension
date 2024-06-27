@@ -55,7 +55,7 @@ namespace webrtc {
     uint8_t encrypted[padded_size];
     memset(encrypted, 0, sizeof(encrypted));
     //Now encrypt:
-    AES_cbc_encrypt(frame.data(), encrypted, padded_size, &_aes_key, _iv.data(), AES_ENCRYPT);
+    AES_cbc_encrypt(frame.data(), encrypted, frame.size(), &_aes_key, _iv.data(), AES_ENCRYPT);
     //Now send the encrypted data back:
     for(size_t i = 0, n = frame.size(); i < n; i++) {
       encrypted_frame[i] = encrypted[i];
@@ -69,8 +69,11 @@ namespace webrtc {
     size_t frame_size) 
   {
     // AES256/CBC uses 128-bit blocks, so the size will always be a multiple of 16. 
+    // Note that we are NOT using PKCS5 padding, so if it is already a multiple of 16, no need to do anything.
     // If the value is already a multiple of 16, it is supposed to be bumped up to the next multiple. 
-    return (frame_size + 16) & ~15;
+    return (frame_size % 16 == 0)
+              ? frame_size
+              : (frame_size + 16) & ~15;  //fast way to do x + (x%16)
   }
 
   bool Aes256FrameEncryptor::hadError() { return _error.length() > 0; }
