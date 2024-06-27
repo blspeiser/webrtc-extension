@@ -1,4 +1,5 @@
 .vscode/
+.idea/
 .settings/
 .project
 .classpath
@@ -8,4 +9,5 @@ filelist.txt
 extension/bin/
 boringssl/src/
 boringssl/android-sources.cmake
+
 
