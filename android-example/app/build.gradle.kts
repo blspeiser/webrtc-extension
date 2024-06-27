@@ -51,7 +51,7 @@ android {
 
 dependencies {
     implementation("androidx.core:core-ktx:1.8.0")
-    implementation("org.webrtc:google-webrtc:1.0.32006")
+    implementation(files("src/main/jar/google-webrtc-1.0.42469.jar"))
     implementation(files("src/main/jar/srtp-plugin-1.0.0.jar"))
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

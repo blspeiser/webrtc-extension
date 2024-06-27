@@ -10,7 +10,6 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        jcenter() //need to add JCenter because that's the only place where the WebRTC jar is.
     }
 }
 

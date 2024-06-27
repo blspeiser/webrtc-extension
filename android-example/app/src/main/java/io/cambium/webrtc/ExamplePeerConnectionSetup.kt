@@ -37,7 +37,7 @@ class ExamplePeerConnectionSetup {
             .createIceServer()
 
         val rtcConnection = PeerConnection.RTCConfiguration(Collections.singletonList(iceServer))
-        val peerConnection = peerConnectionFactory.createPeerConnection(rtcConnection, null as Observer)
+        val peerConnection = peerConnectionFactory.createPeerConnection(rtcConnection, null as Observer?)
 
         //OK, now we have our peer connection! This is where we set our frame encryptor!
         peerConnection?.senders?.filterNotNull()?.forEach {
