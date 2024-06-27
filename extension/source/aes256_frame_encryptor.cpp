@@ -51,15 +51,8 @@ namespace webrtc {
   {
     //First, calculate encrypted size:
     const size_t padded_size = GetMaxCiphertextByteSize(cricket::MediaType::MEDIA_TYPE_DATA, frame.size());
-    //Initialize a buffer to encrypt into:
-    uint8_t encrypted[padded_size];
-    memset(encrypted, 0, sizeof(encrypted));
     //Now encrypt:
-    AES_cbc_encrypt(frame.data(), encrypted, frame.size(), &_aes_key, _iv.data(), AES_ENCRYPT);
-    //Now send the encrypted data back:
-    for(size_t i = 0, n = frame.size(); i < n; i++) {
-      encrypted_frame[i] = encrypted[i];
-    }
+    AES_cbc_encrypt(frame.data(), encrypted_frame.data(), frame.size(), &_aes_key, _iv.data(), AES_ENCRYPT);
     if(bytes_written) *bytes_written = padded_size;
     return 0;
   }
