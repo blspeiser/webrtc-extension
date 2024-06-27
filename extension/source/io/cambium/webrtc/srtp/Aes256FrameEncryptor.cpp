@@ -131,7 +131,8 @@ JNIEXPORT jbyteArray JNICALL Java_io_cambium_webrtc_srtp_Aes256FrameEncryptor_en
         __android_log_print(ANDROID_LOG_ERROR, LOG_TOPIC,
                             "Native Aes256FrameEncryptor had error while encrypting: %s",
                             frameEncryptor->getErrorMessage());
-    }
+        return NULL;
+    } 
     __android_log_print(ANDROID_LOG_VERBOSE, LOG_TOPIC, 
                             "Data encrypted successfully (%lu bytes written); preparing byte array for return...",
                             bytes_written);
