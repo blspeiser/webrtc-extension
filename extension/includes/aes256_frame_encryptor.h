@@ -11,7 +11,7 @@
 #include "api/media_types.h"
 #include "rtc_base/ref_counted_object.h"
 
-#include <openssl/aes.h>
+#include <openssl/evp.h>
 
 namespace webrtc {
   class Aes256FrameEncryptor : public rtc::RefCountedObject<FrameEncryptorInterface> {
@@ -45,7 +45,7 @@ namespace webrtc {
         std::vector<uint8_t> _key;
         std::vector<uint8_t> _iv;
         std::string _error;
-        AES_KEY _aes_key;
+        EVP_CIPHER_CTX *ctx = NULL;
   };
 }
 

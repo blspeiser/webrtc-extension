@@ -8,6 +8,7 @@
 #include <vector>
 
 #include <openssl/aes.h>
+#include <openssl/evp.h>
 #include <openssl/crypto.h>
 #include <openssl/err.h>
 
@@ -30,15 +31,20 @@ namespace webrtc {
       return;
     }
     //otherwise
-    int status = AES_set_encrypt_key(key.data(), AES_KEY_LENGTH_BITS, &_aes_key);
-    if(status != 0) {
-      _error = "Failed to set encryption key";
+    ctx = EVP_CIPHER_CTX_new();
+    if(ctx == NULL) {
+      _error = "Failed to initialize cypher context";
       return;
+    }
+    int status = EVP_EncryptInit_ex(ctx, EVP_aes_256_ctr(), nullptr, key.data(), iv.data());
+    if(status != 1) {
+      _error = "Failed to initialize cipher with key and initialization vector";
+      EVP_CIPHER_CTX_free(ctx);
     }
   }
 
   Aes256FrameEncryptor::~Aes256FrameEncryptor() {
-    //nothing to do (_aes_key is not a pointer type, so don't need to delete it; and neither are the stl fields)
+    EVP_CIPHER_CTX_free(ctx);
   }
 
   int Aes256FrameEncryptor::Encrypt(
@@ -49,11 +55,15 @@ namespace webrtc {
     rtc::ArrayView<uint8_t> encrypted_frame,
     size_t* bytes_written) 
   {
-    //First, calculate encrypted size:
-    const size_t padded_size = GetMaxCiphertextByteSize(cricket::MediaType::MEDIA_TYPE_DATA, frame.size());
     //Now encrypt:
-    AES_cbc_encrypt(frame.data(), encrypted_frame.data(), frame.size(), &_aes_key, _iv.data(), AES_ENCRYPT);
-    if(bytes_written) *bytes_written = padded_size;
+    int outputted = 0;
+    int status = EVP_EncryptUpdate(ctx, 
+      encrypted_frame.data(), &outputted, 
+      frame.data(), frame.size());
+    if(status != 1) {
+      _error = "Failed to encrypt data!";
+    }
+    if(bytes_written) *bytes_written = outputted;
     return 0;
   }
 
@@ -61,12 +71,8 @@ namespace webrtc {
     cricket::MediaType media_type,
     size_t frame_size) 
   {
-    // AES256/CBC uses 128-bit blocks, so the size will always be a multiple of 16. 
-    // Note that we are NOT using PKCS5 padding, so if it is already a multiple of 16, no need to do anything.
-    // If the value is already a multiple of 16, it is supposed to be bumped up to the next multiple. 
-    return (frame_size % 16 == 0)
-              ? frame_size
-              : (frame_size + 16) & ~15;  //fast way to do x + (x%16)
+    // AES/CTR256/NoPadding returns the exact same size of the original data, always
+    return frame_size;
   }
 
   bool Aes256FrameEncryptor::hadError() { return _error.length() > 0; }

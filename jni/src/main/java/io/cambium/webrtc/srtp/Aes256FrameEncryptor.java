@@ -4,6 +4,14 @@ import javax.crypto.SecretKey;
 
 import org.webrtc.FrameEncryptor;
 
+/**
+ * 
+ * Aes256FrameEncryptor.
+ *
+ *  Encrypts frames for WebRTC using AES CTR 256 with no padding. 
+ *
+ * @author Baruch Speiser, Cambium.
+ */
 public class Aes256FrameEncryptor implements FrameEncryptor {
   private final byte[] key;
   private final byte[] iv;

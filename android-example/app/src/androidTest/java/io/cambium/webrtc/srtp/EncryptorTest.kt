@@ -31,7 +31,7 @@ class EncryptorTest {
         keygen.init(256);
         val key = keygen.generateKey()
         val iv = ByteArray(16)
-        val content = ByteArray(128)
+        val content = ByteArray(73)
         rand.nextBytes(iv)
         rand.nextBytes(content)
         //Arrays.fill(content, 0x00)
@@ -39,7 +39,7 @@ class EncryptorTest {
         val ivHex = iv.toHexString()
 
         //Baseline: Encrypt using JCA, so we can compare to it.
-        val cipher = Cipher.getInstance("AES/CBC/NoPadding")
+        val cipher = Cipher.getInstance("AES/CTR/NoPadding")
         cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec)
         val baseline = cipher.doFinal(content)
         Log.d("io.cambium.webrtc.srtp.Aes256FrameEncryptor", "Baseline length: " + baseline.size)
