@@ -1,6 +1,7 @@
 package io.cambium.webrtc
 
 import android.content.Context
+import io.cambium.webrtc.srtp.Aes256FrameDecryptor
 import io.cambium.webrtc.srtp.Aes256FrameEncryptor
 import org.webrtc.PeerConnection
 import org.webrtc.PeerConnection.Observer
@@ -8,7 +9,6 @@ import org.webrtc.PeerConnectionFactory
 import java.security.SecureRandom
 import java.util.Collections
 import javax.crypto.KeyGenerator
-import javax.crypto.spec.IvParameterSpec
 
 class ExamplePeerConnectionSetup {
 
@@ -39,9 +39,12 @@ class ExamplePeerConnectionSetup {
         val rtcConnection = PeerConnection.RTCConfiguration(Collections.singletonList(iceServer))
         val peerConnection = peerConnectionFactory.createPeerConnection(rtcConnection, null as Observer?)
 
-        //OK, now we have our peer connection! This is where we set our frame encryptor!
+        //OK, now we have our peer connection! This is where we set our frame encryptor & decryptor!
         peerConnection?.senders?.filterNotNull()?.forEach {
             it.setFrameEncryptor( Aes256FrameEncryptor(key, ivHex) )
+        }
+        peerConnection?.receivers?.filterNotNull()?.forEach {
+            it.setFrameDecryptor( Aes256FrameDecryptor(key, ivHex) )
         }
 
         //now do your streaming, have a nice day :)

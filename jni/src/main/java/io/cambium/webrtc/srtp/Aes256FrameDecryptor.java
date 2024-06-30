@@ -2,19 +2,19 @@ package io.cambium.webrtc.srtp;
 
 import javax.crypto.SecretKey;
 
-import org.webrtc.FrameEncryptor;
+import org.webrtc.FrameDecryptor;
 
 import io.cambium.util.HexUtil;
 
 /**
  * 
- * Aes256FrameEncryptor.
+ * Aes256FrameDecryptor.
  *
- *  Encrypts frames for WebRTC using AES CTR 256 with no padding. 
+ *  Decrypts frames for WebRTC using AES CTR 256 with no padding. 
  *
  * @author Baruch Speiser, Cambium.
  */
-public class Aes256FrameEncryptor implements FrameEncryptor {
+public class Aes256FrameDecryptor implements FrameDecryptor {
   private final byte[] key;
   private final byte[] iv;
   private long pointer; 
@@ -23,7 +23,7 @@ public class Aes256FrameEncryptor implements FrameEncryptor {
     System.loadLibrary("srtp");
   }
   
-  public Aes256FrameEncryptor(byte[] key, byte[] iv) {
+  public Aes256FrameDecryptor(byte[] key, byte[] iv) {
     if(null == key || key.length != 32) {
       throw new IllegalArgumentException("Key must be exactly 32 bytes!");
     }
@@ -34,15 +34,15 @@ public class Aes256FrameEncryptor implements FrameEncryptor {
     this.iv = iv;
     this.pointer = initialize();
     if(this.pointer == 0) {
-      throw new TypeNotPresentException("Native Aes256FrameEncryptor", null); //message is appended with " type not present"
+      throw new TypeNotPresentException("Native Aes256FrameDecryptor", null); //message is appended with " type not present"
     }
   }
   
-  public Aes256FrameEncryptor(SecretKey key, byte[] iv) {
+  public Aes256FrameDecryptor(SecretKey key, byte[] iv) {
     this(key.getEncoded(), iv);
   }
   
-  public Aes256FrameEncryptor(SecretKey key, String ivHex) {
+  public Aes256FrameDecryptor(SecretKey key, String ivHex) {
     this(key, HexUtil.decode(ivHex));
   }
 
@@ -50,13 +50,13 @@ public class Aes256FrameEncryptor implements FrameEncryptor {
   private native void destroy(long pointer);
   
   //These method exists for testing the JNI and native implementation. 
-  private native byte[] encrypt(long pointer, byte[] bytes);
-  public byte[] encrypt(byte[] bytes) { 
-    return encrypt(this.pointer, bytes); 
+  private native byte[] decrypt(long pointer, byte[] bytes);
+  public byte[] decrypt(byte[] bytes) { 
+    return decrypt(this.pointer, bytes); 
   }
   
   @Override
-  public long getNativeFrameEncryptor() {
+  public long getNativeFrameDecryptor() {
     return this.pointer;
   }
   
@@ -71,5 +71,5 @@ public class Aes256FrameEncryptor implements FrameEncryptor {
     destroy(this.pointer);
     super.finalize();
   }
-  
+
 }

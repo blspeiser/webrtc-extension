@@ -34,7 +34,6 @@ class EncryptorTest {
         val content = ByteArray(73)
         rand.nextBytes(iv)
         rand.nextBytes(content)
-        //Arrays.fill(content, 0x00)
         val ivSpec = IvParameterSpec(iv)
         val ivHex = iv.toHexString()
 

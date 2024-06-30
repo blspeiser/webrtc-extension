@@ -1,8 +1,8 @@
-#ifndef AES256_FRAME_ENCRYPTOR_CPP
-#define AES256_FRAME_ENCRYPTOR_CPP
+#ifndef AES256_FRAME_DECRYPTOR_CPP
+#define AES256_FRAME_DECRYPTOR_CPP
 
 #include "aes256.h"
-#include "aes256_frame_encryptor.h"
+#include "aes256_frame_decryptor.h"
 #include "rtc_base/checks.h"
 
 #include <string>
@@ -15,7 +15,7 @@
 
 namespace webrtc {
 
-  Aes256FrameEncryptor::Aes256FrameEncryptor(
+  Aes256FrameDecryptor::Aes256FrameDecryptor(
     std::vector<uint8_t> key,
     std::vector<uint8_t> iv) 
   : _key(key), _iv(iv), _error("") 
@@ -34,46 +34,46 @@ namespace webrtc {
       _error = "Failed to initialize cypher context";
       return;
     }
-    int status = EVP_EncryptInit_ex(ctx, EVP_aes_256_ctr(), nullptr, key.data(), iv.data());
+    int status = EVP_DecryptInit_ex(ctx, EVP_aes_256_ctr(), nullptr, key.data(), iv.data());
     if(status != 1) {
       _error = "Failed to initialize cipher with key and initialization vector";
       EVP_CIPHER_CTX_free(ctx);
     }
   }
 
-  Aes256FrameEncryptor::~Aes256FrameEncryptor() {
+  Aes256FrameDecryptor::~Aes256FrameDecryptor() {
     EVP_CIPHER_CTX_free(ctx);
   }
 
-  int Aes256FrameEncryptor::Encrypt(
+  FrameDecryptorInterface::Result Aes256FrameDecryptor::Decrypt(
     cricket::MediaType media_type,
-    uint32_t ssrc,
+    const std::vector<uint32_t>& csrcs,
     rtc::ArrayView<const uint8_t> additional_data,
-    rtc::ArrayView<const uint8_t> frame,
-    rtc::ArrayView<uint8_t> encrypted_frame,
-    size_t* bytes_written) 
+    rtc::ArrayView<const uint8_t> encrypted_frame,
+    rtc::ArrayView<uint8_t> frame)
   {
     //Now encrypt:
     int outputted = 0;
-    int status = EVP_EncryptUpdate(ctx, 
-      encrypted_frame.data(), &outputted, 
-      frame.data(), frame.size());
+    int status = EVP_DecryptUpdate(ctx, 
+      frame.data(), &outputted, 
+      encrypted_frame.data(), encrypted_frame.size());
     if(status != 1) {
       _error = "Failed to encrypt data!";
     }
-    if(bytes_written) *bytes_written = outputted;
-    return 0;
+    return this->hadError() 
+        ? FrameDecryptorInterface::Result(FrameDecryptorInterface::Status::kFailedToDecrypt, outputted)
+        : FrameDecryptorInterface::Result(FrameDecryptorInterface::Status::kOk, outputted);
   }
 
-  size_t Aes256FrameEncryptor::GetMaxCiphertextByteSize(
+  size_t Aes256FrameDecryptor::GetMaxPlaintextByteSize(
     cricket::MediaType media_type,
-    size_t frame_size) 
+    size_t encrypted_frame_size) 
   {
     // AES/CTR256/NoPadding returns the exact same size of the original data, always
-    return frame_size;
+    return encrypted_frame_size;
   }
 
-  bool Aes256FrameEncryptor::hadError() { return _error.length() > 0; }
-  const char* Aes256FrameEncryptor::getErrorMessage() { return _error.c_str(); }
+  bool Aes256FrameDecryptor::hadError() { return _error.length() > 0; }
+  const char* Aes256FrameDecryptor::getErrorMessage() { return _error.c_str(); }
 }
 #endif

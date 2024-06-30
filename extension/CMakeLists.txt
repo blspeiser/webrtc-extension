@@ -24,7 +24,10 @@ target_include_directories(${CMAKE_PROJECT_NAME} SYSTEM PRIVATE ${BORINGSSL_SRC}
 target_sources(${CMAKE_PROJECT_NAME}
         PRIVATE
         ${PROJECT_SOURCE_DIR}/source/aes256_frame_encryptor.cpp
-        ${PROJECT_SOURCE_DIR}/source/io/cambium/webrtc/srtp/Aes256FrameEncryptor.cpp)
+        ${PROJECT_SOURCE_DIR}/source/aes256_frame_decryptor.cpp
+        ${PROJECT_SOURCE_DIR}/source/io/cambium/webrtc/srtp/Aes256FrameEncryptor.cpp
+        ${PROJECT_SOURCE_DIR}/source/io/cambium/webrtc/srtp/Aes256FrameDecryptor.cpp
+)
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
         PRIVATE
