@@ -54,7 +54,7 @@ JNIEXPORT jlong JNICALL Java_io_cambium_webrtc_srtp_Aes256FrameDecryptor_initial
     __android_log_print(ANDROID_LOG_VERBOSE, DECRYPTOR_LOG, "Reading byte arrays from Java Aes256FrameDecryptor...");
     env->GetByteArrayRegion(key, 0, sizeKey, reinterpret_cast<jbyte*>(vKey.data()));
     env->GetByteArrayRegion(iv,  0, sizeIV,  reinterpret_cast<jbyte*>(vIV.data()));
-    __android_log_print(ANDROID_LOG_VERBOSE, DECRYPTOR_LOG, "Creative native Aes256FrameDecryptor...");
+    __android_log_print(ANDROID_LOG_VERBOSE, DECRYPTOR_LOG, "Creating native Aes256FrameDecryptor...");
     webrtc::Aes256FrameDecryptor* frameDecryptor = new webrtc::Aes256FrameDecryptor(vKey, vIV);
     if(frameDecryptor->hadError()) {
         __android_log_print(ANDROID_LOG_ERROR, DECRYPTOR_LOG,
