@@ -42,6 +42,10 @@ public class Aes256FrameDecryptor implements FrameDecryptor {
     this(key.getEncoded(), iv);
   }
   
+  public Aes256FrameDecryptor(byte[] key, String ivHex) {
+    this(key, HexUtil.decode(ivHex));
+  }
+  
   public Aes256FrameDecryptor(SecretKey key, String ivHex) {
     this(key, HexUtil.decode(ivHex));
   }
@@ -49,7 +53,7 @@ public class Aes256FrameDecryptor implements FrameDecryptor {
   private native long initialize();
   private native void destroy(long pointer);
   
-  //These method exists for testing the JNI and native implementation. 
+  //These methods exists for testing the JNI and native implementation. 
   private native byte[] decrypt(long pointer, byte[] bytes);
   public byte[] decrypt(byte[] bytes) { 
     return decrypt(this.pointer, bytes); 
